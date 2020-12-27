@@ -15,20 +15,23 @@ typedef struct pracownik{
     struct pracownik *nastepny;
 } pracownik_t;
 
+//headery funkcji listy
 void wypisz_liste(pracownik_t *head);
 void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja);
 void usun_pracownika(pracownik_t *head, char pesel[12]);
+void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]);
 
 int main(){
     int wybor = 0; // wybor z menu
     int program = 1; //gdy rowne 0, program sie konczy    char nazwisko[20];
 
-    // dodwanie pracownika case2
+    // dodwanie pracownika switchu
     char nazwisko[20];
     char imie[20];
     char pesel[12]; // char zamiast int, bo pesel moze zaczynac sie od 0
     char data_rozp[11];  // format "DD/MM/RRRR"
     int pensja;
+    char nowy_pesel[12];
 
     //tworzenie glowy listy
     pracownik_t *head;
@@ -43,6 +46,7 @@ int main(){
     //wiadomosc powitalna
     printf("Witaj w programie Kadry!\n\n");
 
+    //glowna petla
     while(program){
 
     //wypisz menu
@@ -80,7 +84,13 @@ int main(){
         usun_pracownika(head, pesel);
         break;
     case 4:
-        printf("Funkcja %d niedostepna\n", wybor);
+        system("cls");     //wyczysc console
+        printf("Edytowanie pracownika:\n");
+        printf("Podaj pesel pracownika, ktorego chesz edytowac: \n");
+        scanf("%s", pesel);
+        printf("Podaj nowe nazwisko, imie, pesel, date rozpoczenia (DD/MM/RRRR) oraz pensje:  \n");
+        scanf("%s %s %s %s %d", &nazwisko, &imie, &nowy_pesel, &data_rozp, &pensja);
+        edytuj_pracownika(head, nazwisko, imie, pesel , data_rozp, pensja, nowy_pesel);
         break;
     case 5:
         printf("Funkcja %d niedostepna\n", wybor);
@@ -108,6 +118,7 @@ void wypisz_liste(pracownik_t *head){
         printf("\nLista pracownikow jest pusta.\n");
     }else{
         pracownik_t *ptr = head;
+        //wyglad listy
         for (int i = 0; i<100; i++){ printf("-");}
         printf("\n");
         while(ptr != NULL){
@@ -120,13 +131,15 @@ void wypisz_liste(pracownik_t *head){
 }
 //dodaj pracownika
 void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja){
-  pracownik_t *nowy = (pracownik_t *)malloc(sizeof(pracownik_t));
+  pracownik_t *nowy = (pracownik_t *)malloc(sizeof(pracownik_t)); //alokowanie pamieci nowego pracownia
 
+  //sprawdzanie stanu alokacji
   if(nowy == NULL){
     printf("Error. Pamiec nie zostala zaalokowana.\n");
   }else{
     printf("Pracownik dodany pomyslnie!\n\n");
   };
+
   //dane nowego pracownika
   strcpy(nowy->nazwisko, nazwisko);
   strcpy(nowy->imie , imie);
@@ -138,12 +151,16 @@ void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char
     nowy->nastepny = (*head);
     (*head) = nowy;
 }
+
 //usun pracownika
 void usun_pracownika(pracownik_t *head, char pesel[12]){
+  //pomocnicze wskazniki
   pracownik_t *poprzedni = NULL;
   pracownik_t *aktualny = head;
+
   if (head == NULL) printf("Lista jest pusta! Nic stąd nie usuniesz!\n");
 
+  //czy taki pracownik istnieje?
   while(aktualny->pesel != pesel){
     if(aktualny->nastepny == NULL){
       printf("Nie ma takiego pracownika!\n");
@@ -165,4 +182,33 @@ void usun_pracownika(pracownik_t *head, char pesel[12]){
     }
 
   }
+}
+pracownik_t czy_istanieje(pracownik_t *head, char pesel[12]){
+
+}
+//edytuj pracownika
+void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]){
+  //pomocnicze wskazniki
+  pracownik_t *poprzedni = NULL;
+  pracownik_t *aktualny = head;
+
+  //czy taki pracownik istnieje?
+  while(aktualny->pesel != pesel){
+    if(aktualny->nastepny == NULL){
+      printf("Nie ma takiego pracownika!\n");
+      break;
+    }else{
+      //idziemy przez petle az znajdziemy pesel
+      poprzedni = aktualny;
+      aktualny = aktualny->nastepny;
+    }
+    if (aktualny->pesel == pesel) {printf("Dane zmienione pomyslnie"); break;}
+}
+    //update info
+    strcpy(aktualny->nazwisko, nazwisko);
+    strcpy(aktualny->imie , imie);
+    strcpy(aktualny->pesel , nowy_pesel);
+    strcpy(aktualny->data_rozp , data_rozp);
+    aktualny->pensja = pensja;
+
 }
