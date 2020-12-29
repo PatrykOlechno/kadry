@@ -18,7 +18,7 @@ typedef struct pracownik{
 //headery funkcji listy
 void wypisz_liste(pracownik_t *head);
 void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja);
-void usun_pracownika(pracownik_t *head, char pesel[12]);
+void usun_pracownika(pracownik_t **head, char pesel[12]);
 void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]);
 
 int main(){
@@ -39,9 +39,9 @@ int main(){
     head = NULL;
 
     //testowi pracownicy
-    dodaj_pracownika(&head, "", "Szyc", "75121968629", "31/01/1992", 4000);
-    dodaj_pracownika(&head, "Olech", "Patryk", "75121967621", "12/21/2020", 30000);
-    dodaj_pracownika(&head, "Cukier", "Marek", "75121968723", "04/05/1999", 5000);
+    dodaj_pracownika(&head, "Majk", "Szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "Borys", "Jonhanson", "75121968634", "30/01/2000", 5000);
+    dodaj_pracownika(&head, "Patryk", "Boguslaw", "75121968656", "12/01/1992", 100);
 
     //wiadomosc powitalna
     printf("Witaj w programie Kadry!\n\n");
@@ -81,7 +81,7 @@ int main(){
         printf("Usuwanie pracownika:\n");
         printf("Podaj pesel pracownika ktorego chesz usunac: \n");
         scanf("%s", &pesel);
-        usun_pracownika(head, pesel);
+        usun_pracownika(&head, pesel);
         break;
     case 4:
         system("cls");     //wyczysc console
@@ -153,39 +153,34 @@ void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char
 }
 
 //usun pracownika
-void usun_pracownika(pracownik_t *head, char pesel[12]){
+void usun_pracownika(pracownik_t **head, char pesel[12]){
   //pomocnicze wskazniki
   pracownik_t *poprzedni = NULL;
-  pracownik_t *aktualny = head;
+  pracownik_t *aktualny = *head;
 
-  if (head == NULL) printf("Lista jest pusta! Nic stąd nie usuniesz!\n");
-
+  if (*head == NULL) printf("Lista jest pusta! Nic stąd nie usuniesz!\n");
   //czy taki pracownik istnieje?
-  while(aktualny->pesel != pesel){
+  while(strcmp(aktualny->pesel, pesel)){
     if(aktualny->nastepny == NULL){
       printf("Nie ma takiego pracownika!\n");
       break;
     }else{
-      //idziemy przez petle az znajdziemy pesel
       poprzedni = aktualny;
       aktualny = aktualny->nastepny;
-    }
+    }}
 
-    if (aktualny == head){
+    if (aktualny == *head){
       //przeskakujemy pierwszy element
-      head = head->nastepny;
-      printf("Element zostal usuniety!\n");
-    }else {
-      //przeskakujemy srodkowy elemnt
-      poprzedni->nastepny = aktualny->nastepny;
-      printf("Element zostal usuniety!\n");
+      *head = aktualny->nastepny;
+      printf("Element zostal usuniety 1!\n");
+      }else{
+        //przeskakujemy srodkowy elemnt
+        poprzedni->nastepny = aktualny->nastepny;
+        printf("Element zostal usuniety 2!\n");
+      }
+
     }
 
-  }
-}
-pracownik_t czy_istanieje(pracownik_t *head, char pesel[12]){
-
-}
 //edytuj pracownika
 void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]){
   //pomocnicze wskazniki
@@ -193,7 +188,7 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
   pracownik_t *aktualny = head;
 
   //czy taki pracownik istnieje?
-  while(aktualny->pesel != pesel){
+  while(strcmp(aktualny->pesel, pesel)){
     if(aktualny->nastepny == NULL){
       printf("Nie ma takiego pracownika!\n");
       break;
@@ -202,8 +197,8 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
       poprzedni = aktualny;
       aktualny = aktualny->nastepny;
     }
-    if (aktualny->pesel == pesel) {printf("Dane zmienione pomyslnie"); break;}
-}
+    if (strcmp(aktualny->pesel, pesel)) {printf("Dane zmienione pomyslnie"); break;}
+  }
     //update info
     strcpy(aktualny->nazwisko, nazwisko);
     strcpy(aktualny->imie , imie);
