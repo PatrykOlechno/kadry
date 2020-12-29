@@ -20,6 +20,7 @@ void wypisz_liste(pracownik_t *head);
 void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja);
 void usun_pracownika(pracownik_t **head, char pesel[12]);
 void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]);
+void szukaj_pracownika(pracownik_t *head, char pesel[12]);
 
 int main(){
     int wybor = 0; // wybor z menu
@@ -87,13 +88,17 @@ int main(){
         system("cls");     //wyczysc console
         printf("Edytowanie pracownika:\n");
         printf("Podaj pesel pracownika, ktorego chesz edytowac: \n");
-        scanf("%s", pesel);
+        scanf("%s", &pesel);
         printf("Podaj nowe nazwisko, imie, pesel, date rozpoczenia (DD/MM/RRRR) oraz pensje:  \n");
         scanf("%s %s %s %s %d", &nazwisko, &imie, &nowy_pesel, &data_rozp, &pensja);
         edytuj_pracownika(head, nazwisko, imie, pesel , data_rozp, pensja, nowy_pesel);
         break;
     case 5:
-        printf("Funkcja %d niedostepna\n", wybor);
+        system("cls");     //wyczysc console
+        printf("Szukanie pracownika:\n");
+        printf("Podaj pesel pracownika, ktorego chcesz znalezc: \n");
+        scanf("%s", &pesel);
+        szukaj_pracownika(head, pesel);
         break;
     case 6:
         printf("Funkcja %d niedostepna\n", wybor);
@@ -119,13 +124,13 @@ void wypisz_liste(pracownik_t *head){
     }else{
         pracownik_t *ptr = head;
         //wyglad listy
-        for (int i = 0; i<100; i++){ printf("-");}
+        for (int i = 0; i<80; i++){ printf("*");}
         printf("\n");
         while(ptr != NULL){
             printf("%20s | %20s | %12s | %11s | %d\n", ptr->nazwisko, ptr->imie, ptr->pesel, ptr->data_rozp, ptr->pensja);
             ptr= ptr->nastepny;
         }
-        for (int i = 0; i<100; i++){ printf("-");}
+        for (int i = 0; i<80; i++){ printf("*");}
         printf("\n");
     }
 }
@@ -150,6 +155,9 @@ void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char
   //pracownik na pierwsze miejsce
     nowy->nastepny = (*head);
     (*head) = nowy;
+
+  //pracownik na miejsce po jego literce z alfabetu
+
 }
 
 //usun pracownika
@@ -172,11 +180,11 @@ void usun_pracownika(pracownik_t **head, char pesel[12]){
     if (aktualny == *head){
       //przeskakujemy pierwszy element
       *head = aktualny->nastepny;
-      printf("Element zostal usuniety 1!\n");
+      printf("Element zostal usuniety!\n");
       }else{
         //przeskakujemy srodkowy elemnt
         poprzedni->nastepny = aktualny->nastepny;
-        printf("Element zostal usuniety 2!\n");
+        printf("Element zostal usuniety!\n");
       }
       free(aktualny); //zwolnienie pamieci
     }
@@ -205,4 +213,27 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
     strcpy(aktualny->data_rozp , data_rozp);
     aktualny->pensja = pensja;
     if (strcmp(aktualny->pesel, pesel)) printf("Dane zmienione pomyslnie\n");
+    free(aktualny); //zwolnienie pamieci
+}
+void szukaj_pracownika(pracownik_t *head, char pesel[12]){
+  pracownik_t *poprzedni = NULL;
+  pracownik_t *aktualny = head;
+
+  //czy taki pracownik istnieje?
+  while((strcmp(aktualny->pesel, pesel))){
+    if(aktualny->nastepny == NULL){
+      printf("Nie ma takiego pracownika!\n");
+      break;
+    }else{
+      //idziemy przez petle az znajdziemy pesel
+      poprzedni = aktualny;
+      aktualny = aktualny->nastepny;
+    }
+  }
+  printf("\nDane pracownika:\n");
+  for (int i = 0; i<80; i++){ printf("-");}
+  printf("\n");
+  printf("%20s | %20s | %12s | %11s | %d\n", aktualny->nazwisko, aktualny->imie, aktualny->pesel, aktualny->data_rozp, aktualny->pensja);
+  for (int i = 0; i<80; i++){ printf("-");}
+  printf("\n\n");
 }
