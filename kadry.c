@@ -178,7 +178,7 @@ void usun_pracownika(pracownik_t **head, char pesel[12]){
         poprzedni->nastepny = aktualny->nastepny;
         printf("Element zostal usuniety 2!\n");
       }
-
+      free(aktualny); //zwolnienie pamieci
     }
 
 //edytuj pracownika
@@ -188,7 +188,7 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
   pracownik_t *aktualny = head;
 
   //czy taki pracownik istnieje?
-  while(strcmp(aktualny->pesel, pesel)){
+  while((strcmp(aktualny->pesel, pesel))){
     if(aktualny->nastepny == NULL){
       printf("Nie ma takiego pracownika!\n");
       break;
@@ -197,7 +197,6 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
       poprzedni = aktualny;
       aktualny = aktualny->nastepny;
     }
-    if (strcmp(aktualny->pesel, pesel)) {printf("Dane zmienione pomyslnie"); break;}
   }
     //update info
     strcpy(aktualny->nazwisko, nazwisko);
@@ -205,5 +204,5 @@ void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char
     strcpy(aktualny->pesel , nowy_pesel);
     strcpy(aktualny->data_rozp , data_rozp);
     aktualny->pensja = pensja;
-
+    if (strcmp(aktualny->pesel, pesel)) printf("Dane zmienione pomyslnie\n");
 }
