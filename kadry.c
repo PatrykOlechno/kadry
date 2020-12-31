@@ -21,6 +21,7 @@ void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char
 void usun_pracownika(pracownik_t **head, char pesel[12]);
 void edytuj_pracownika(pracownik_t *head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja, char nowy_pesel[12]);
 void szukaj_pracownika(pracownik_t *head, char pesel[12]);
+void eksportuj_od_danej_pensji(pracownik_t *head, int pensja);
 
 int main(){
     int wybor = 0; // wybor z menu
@@ -40,9 +41,19 @@ int main(){
     head = NULL;
 
     //testowi pracownicy
-    dodaj_pracownika(&head, "Majk", "Szyc", "75121968629", "31/01/1992", 4000);
-    dodaj_pracownika(&head, "Borys", "Jonhanson", "75121968634", "30/01/2000", 5000);
-    dodaj_pracownika(&head, "Patryk", "Boguslaw", "75121968656", "12/01/1992", 100);
+    dodaj_pracownika(&head, "cela", "jonhanson", "75121968634", "30/01/2000", 5000);
+    dodaj_pracownika(&head, "blonie", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "asd", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "gdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "mdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "odc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "hdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "zdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "rdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "gdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "xdc", "szyc", "75121968629", "31/01/1992", 4000);
+    dodaj_pracownika(&head, "fdc", "szyc", "75121968629", "31/01/1992", 4000);
+
 
     //wiadomosc powitalna
     printf("Witaj w programie Kadry!\n\n");
@@ -104,7 +115,10 @@ int main(){
         printf("Funkcja %d niedostepna\n", wybor);
         break;
     case 7:
-        printf("Funkcja %d niedostepna\n", wybor);
+        system("cls");     //wyczysc console
+        printf("Podaj minimalna pensja od ktorej zaczac eksportowanie: ");
+        scanf("%d", &pensja);
+        eksportuj_od_danej_pensji(head, pensja);
         break;
     case 8:
         printf("Do zobaczenia!\n");
@@ -134,32 +148,68 @@ void wypisz_liste(pracownik_t *head){
         printf("\n");
     }
 }
-//dodaj pracownika
+//dodaje pracownika na jego miejsce
 void dodaj_pracownika(pracownik_t **head, char nazwisko[20], char imie[20], char pesel[12], char data_rozp[11], int pensja){
-  pracownik_t *nowy = (pracownik_t *)malloc(sizeof(pracownik_t)); //alokowanie pamieci nowego pracownia
+    pracownik_t *nowy = (pracownik_t *)malloc(sizeof(pracownik_t));
+    pracownik_t *aktualny = *head;
+    pracownik_t *poprzedni = NULL;
 
-  //sprawdzanie stanu alokacji
-  if(nowy == NULL){
-    printf("Error. Pamiec nie zostala zaalokowana.\n");
-  }else{
-    printf("Pracownik dodany pomyslnie!\n\n");
-  };
+    //blad rezerwacji pamieci
+    if(nowy == NULL){
+        printf("Nie udalo sie zarezerwowac pamieci. Quitting...\n");
+        return;
+    }else{
+        //Dane nowego pracownika
+        strcpy(nowy->nazwisko, nazwisko);
+        strcpy(nowy->imie , imie);
+        strcpy(nowy->pesel , pesel);
+        strcpy(nowy->data_rozp , data_rozp);
+        nowy->pensja = pensja;
 
-  //dane nowego pracownika
-  strcpy(nowy->nazwisko, nazwisko);
-  strcpy(nowy->imie , imie);
-  strcpy(nowy->pesel , pesel);
-  strcpy(nowy->data_rozp , data_rozp);
-  nowy->pensja = pensja;
+        //Jesli lista jest pusta dodaj go na poczatek
+        if(*head == NULL){
+            nowy->nastepny = (*head);
+            (*head) = nowy;
+            printf("1");
+        }
+        else{
+        //Inaczej idz do nastepnego miejsca dopoki roznica kolejncyh liter alfabetu bedzie (a-b = 10-11) ujemna
+        if(strcmp(aktualny->nazwisko, nowy->nazwisko) > 0){
+            //Pasuje na pierwsze miejsce
+            nowy->nastepny = (*head);
+            (*head) = nowy;
+        }else if((strcmp(aktualny->nazwisko, nowy->nazwisko) < 0) && aktualny->nastepny == NULL){
+            //gdy sa dwa elementy w liscie wskaznik na nastepny zbyt szybko wykracza poza zasieg
+            nowy->nastepny = aktualny->nastepny;
+            aktualny->nastepny = nowy;
+        }else{
+            //aktualizujemy wskazniki, bo przy pierwszym wywolaniu poprzedni wskazuje na NULL i bysmy wychodzili poza nasza pamiec
+            poprzedni=aktualny;
+            aktualny= aktualny->nastepny;
 
-  //pracownik na pierwsze miejsce
-    nowy->nastepny = (*head);
-    (*head) = nowy;
-
-  //pracownik na miejsce po jego literce z alfabetu
-
+            //powtarzamy petle do konca listy lub jesli element pasuje wczesniej
+            while(aktualny != NULL){
+               if(strcmp(aktualny->nazwisko, nowy->nazwisko) > 0){
+                   //Nastepnie dodaj go na to miejsce
+                   nowy->nastepny = aktualny;
+                   poprzedni->nastepny = nowy;
+                   //wychodzimy z petli
+                   break;}
+               else{
+                    //nic w petli tym razem, idziemy do nastepnej iteracji
+                    poprzedni=aktualny;
+                    aktualny = aktualny->nastepny;
+                }
+            }
+            //jesli wyszlismy z petli, to doszlismy do konca bez rezultatu; dodajemy tam pracownika
+            if(aktualny ==NULL){
+                nowy->nastepny = aktualny;
+                poprzedni->nastepny = nowy;
+            }
+        }
+        }
+    }
 }
-
 //usun pracownika
 void usun_pracownika(pracownik_t **head, char pesel[12]){
   //pomocnicze wskazniki
@@ -236,4 +286,20 @@ void szukaj_pracownika(pracownik_t *head, char pesel[12]){
   printf("%20s | %20s | %12s | %11s | %d\n", aktualny->nazwisko, aktualny->imie, aktualny->pesel, aktualny->data_rozp, aktualny->pensja);
   for (int i = 0; i<80; i++){ printf("-");}
   printf("\n\n");
+}
+void eksportuj_od_danej_pensji(pracownik_t *head, int pensja){
+  pracownik_t *aktualny = head;
+  FILE * file = fopen("output.txt", "w");
+  if (file != NULL){
+    while(aktualny != NULL){
+      if(aktualny->pensja > pensja){
+          fprintf(file, "%20s | %20s | %12s | %11s | %d\n", aktualny->nazwisko, aktualny->imie, aktualny->pesel, aktualny->data_rozp, aktualny->pensja);
+      }
+      aktualny = aktualny->nastepny;
+    }
+    printf("\nDodano od pliku o nazwie output.txt\n\n");
+    fclose(file);
+  }else{
+    printf("Plik nie istnieje");
+  }
 }
